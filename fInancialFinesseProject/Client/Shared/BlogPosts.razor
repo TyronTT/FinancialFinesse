@@ -1,0 +1,26 @@
+﻿@using fInancialFinesseProject.Shared.Domain
+@inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+    
+@foreach(var post in Posts)
+{
+    <div style="margin: 20px;">
+        <div>
+            <h3>@post.Title</h3>
+        </div>
+        <div>
+            @post.Description
+        </div>
+        <div>
+            <a href="/posts/@post.Url">Read More...</a>
+        </div>
+    </div>
+}
+
+@code {
+    private List<BlogPost> Posts = new List<BlogPost>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Posts = await BlogService.GetBlogPosts();
+    }
+}

@@ -1,0 +1,27 @@
+﻿@page "/posts/{url}"
+@inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+
+@if (CurrentPost == null)
+{
+    <span>Getting that Blog Post from the service...</span>
+}
+else
+{
+    <h3>@CurrentPost.Title</h3>
+
+    <div>
+        @CurrentPost.Content
+    </div>
+}
+
+@code {
+    private fInancialFinesseProject.Shared.Domain.BlogPost CurrentPost;
+
+    [Parameter]
+    public string Url { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentPost = await BlogService.GetBlogPostByUrl(Url);
+    }
+}
