@@ -17,7 +17,7 @@ namespace fInancialFinesseProject.Client.Services
 
         public async Task<BlogPost> CreateNewBlogPost(BlogPost request)
         {
-            var result = await _http.PostAsJsonAsync("api/Blog", request);
+            var result = await _http.PostAsJsonAsync("api/Blog", request);  
             return await result.Content.ReadFromJsonAsync<BlogPost>();
         }
 

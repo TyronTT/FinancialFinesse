@@ -9,6 +9,12 @@
     <DataAnnotationsValidator />
 
     <div class="form-group">
+        <label for="author">Author</label>
+        <InputText id="author" @bind-Value="newBlogPost.Author" class="form-control" />
+        <ValidationMessage For="@(() => newBlogPost.Author)" />
+    </div>
+
+    <div class="form-group">
         <label for="title">Title</label>
         <InputText id="title" @bind-Value="newBlogPost.Title" class="form-control" />
         <ValidationMessage For="@(() => newBlogPost.Title)" />
@@ -47,7 +53,10 @@
 </EditForm>
 
 @code {
-    fInancialFinesseProject.Shared.Domain.BlogPost newBlogPost = new fInancialFinesseProject.Shared.Domain.BlogPost();
+    fInancialFinesseProject.Shared.Domain.BlogPost newBlogPost = new fInancialFinesseProject.Shared.Domain.BlogPost
+        {
+            Author = "" // Setting the default value of author to an empty string
+        };
 
     async Task CreateNewBlogPost()
     {

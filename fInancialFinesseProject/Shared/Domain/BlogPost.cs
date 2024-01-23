@@ -21,7 +21,7 @@ namespace fInancialFinesseProject.Shared.Domain
 
         [Required]
         public string Content { get; set; }
-        public string Author { get; set; }
+        public string Author { get; set; } 
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public bool IsPublished { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
