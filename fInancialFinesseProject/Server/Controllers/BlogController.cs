@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Build.Construction;
 
+
 namespace fInancialFinesseProject.Server.Controllers
 {
     [Route("api/[controller]")]
@@ -18,7 +19,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<BlogPost>> GimmeAllTheBlogPost()
+        public ActionResult<List<BlogPost>> GimmeAllTheBlogPosts()
         {
             return Ok(_context.BlogPosts);
         }
@@ -33,6 +34,15 @@ namespace fInancialFinesseProject.Server.Controllers
             }
 
             return Ok(post);
+        }
+       
+        [HttpPost]
+        public async Task<ActionResult<BlogPost>> CreateNewBlogPost(BlogPost request)
+        {
+            _context.Add(request);
+            await _context.SaveChangesAsync();
+
+            return request;
         }
     }
 }
