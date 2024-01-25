@@ -1,0 +1,30 @@
+﻿@using fInancialFinesseProject.Shared
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+
+@foreach(var post in Posts)
+{
+    <div style="margin: 20px;">
+        <div>
+            <img src="@post.Image" width="200" />
+        </div>
+        <div>
+            <h3>@post.Title</h3>
+        </div>
+        <div>
+            @post.Description
+        </div>
+        <div>
+            <a href="/forums/@post.Url">Read More...</a>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ForumPost> Posts = new List<ForumPost>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Posts = await ForumService.GetForumPosts();
+    }
+}
+

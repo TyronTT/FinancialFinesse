@@ -1,8 +1,10 @@
 ﻿using Duende.IdentityServer.EntityFramework.Options;
 using fInancialFinesseProject.Server.Models;
+using fInancialFinesseProject.Shared;
 using fInancialFinesseProject.Shared.Domain;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using Microsoft.Extensions.Options;
 
 namespace fInancialFinesseProject.Server.Data
@@ -24,5 +26,15 @@ namespace fInancialFinesseProject.Server.Data
         }
 
         public DbSet<BlogPost> BlogPosts { get; set; }
+    }
+
+    public class ForumDataContext : DbContext
+    {
+        public ForumDataContext(DbContextOptions<ForumDataContext> options) : base(options)
+        {
+
+        }
+
+        public DbSet<ForumPost> ForumPosts { get; set; }
     }
 }

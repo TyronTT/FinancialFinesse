@@ -1,0 +1,29 @@
+﻿@page "/forums/{url}"
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+
+@if (CurrentPost == null)
+{
+    <span>Getting that Forum Post from the service...</span>
+}
+else
+{
+    <img src="@CurrentPost.Image" />
+
+    <h3>@CurrentPost.Title</h3>
+
+    <div>
+        @CurrentPost.Content
+    </div>
+}
+
+@code {
+    private fInancialFinesseProject.Shared.ForumPost CurrentPost;
+
+    [Parameter]
+    public string Url { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentPost = await ForumService.GetForumPostbyUrl(Url);
+    }
+}

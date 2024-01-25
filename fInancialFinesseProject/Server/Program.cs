@@ -24,6 +24,7 @@ builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
+builder.Services.AddDbContext<ForumDataContext>(x => x.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnectionForum")));
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 

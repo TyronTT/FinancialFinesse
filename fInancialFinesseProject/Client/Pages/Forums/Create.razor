@@ -1,0 +1,82 @@
+﻿@page "/createforum"
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+@inject NavigationManager NavigationManager
+
+<h3>Create a new Forum</h3>
+
+<EditForm Model="@newForumPost" OnValidSubmit="CreateNewForumPost">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="author">Author</label>
+        <InputText id="author" @bind-Value="newForumPost.Author" class="form-control" />
+        <ValidationMessage For="@(() => newForumPost.Author)" />
+    </div>
+
+    <div class="form-group">
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="newForumPost.Title" class="form-control" />
+        <ValidationMessage For="@(() => newForumPost.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label for="url">Url</label>
+        <InputText id="url" @bind-Value="newForumPost.Url" class="form-control" />
+        <ValidationMessage For="@(() => newForumPost.Url)" />
+    </div>
+
+    <div class="form-control-file">
+        <label for="image">Image</label>
+        <InputFile OnChange="OnFileChange" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="newForumPost.Description" class="form-control" />
+        <ValidationMessage For="@(() => newForumPost.Description)" />
+    </div>
+
+    <div class="form-group">
+        <label for="content">Content</label>
+        <InputTextArea id="content" @bind-Value="newForumPost.Content" class="form-control" />
+        <ValidationMessage For="@(() => newForumPost.Content)" />
+    </div>
+
+    <div class="form-group">
+        <label for="date">Date</label>
+        <InputDate id="date" @bind-Value="newForumPost.DateCreated" class="form-control" />
+    </div>
+
+    <div class="form-check">
+        <InputCheckbox id="isPublished" @bind-Value="newForumPost.IsPublished" class="form-check-input" />
+        <label for="isPublished">Publish</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <ValidationSummary />
+</EditForm>
+
+@code {
+    fInancialFinesseProject.Shared.ForumPost newForumPost = new fInancialFinesseProject.Shared.ForumPost
+        {
+            Image = ""
+        };
+
+    async void CreateNewForumPost()
+    {
+        var result = await ForumService.CreateNewForumPost(newForumPost);
+        NavigationManager.NavigateTo($"forums/{result.Url}");
+    }
+
+    async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        var resizedImage = await e.File.RequestImageFileAsync(format, 300, 300);
+        var buffer = new byte[resizedImage.Size];
+        await resizedImage.OpenReadStream().ReadAsync(buffer);
+        var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        newForumPost.Image = imageData;
+
+        Console.WriteLine(newForumPost.Image);
+    }
+}

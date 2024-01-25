@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager Navigation
 @inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -47,12 +48,17 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="create">
-                <span class="oi oi-plus" aria-hidden="true"></span> Create
+                <span class="oi oi-plus" aria-hidden="true"></span> Create Blog
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="forums">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Forums
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="createforum">
+                <span class="oi oi-plus" aria-hidden="true"></span> Create Forum
             </NavLink>
         </div>
     </nav>
