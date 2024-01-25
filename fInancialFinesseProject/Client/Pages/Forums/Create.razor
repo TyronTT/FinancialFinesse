@@ -1,6 +1,7 @@
 ﻿@page "/createforum"
 @inject fInancialFinesseProject.Client.Services2.IForumService ForumService
 @inject NavigationManager NavigationManager
+@using Markdig
 
 <h3>Create a new Forum</h3>
 
@@ -38,8 +39,13 @@
 
     <div class="form-group">
         <label for="content">Content</label>
-        <InputTextArea id="content" @bind-Value="newForumPost.Content" class="form-control" />
+        <ForumTextArea id="content" @bind-Value="newForumPost.Content" class="form-control" />
         <ValidationMessage For="@(() => newForumPost.Content)" />
+    </div>
+
+    <div class="form-group">
+        <label for="contentPreview">Content Preview</label>
+        <div id="contentPreview" style="height: 100%" class="form-control">@((MarkupString)Markdown.ToHtml(newForumPost.Content))</div>
     </div>
 
     <div class="form-group">

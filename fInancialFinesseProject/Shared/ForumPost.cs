@@ -15,7 +15,7 @@ namespace fInancialFinesseProject.Shared
         public String Title { get; set; }
 
         [Required]
-        public String Content { get; set; }
+        public String Content { get; set; } = string.Empty;
 
         [Required, StringLength(100)]
         public String Description { get; set; }

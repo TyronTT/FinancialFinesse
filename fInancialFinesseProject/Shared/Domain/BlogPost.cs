@@ -20,7 +20,7 @@ namespace fInancialFinesseProject.Shared.Domain
         public string Description { get; set; }
 
         [Required]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         [Required]
         public string Author { get; set; } 
