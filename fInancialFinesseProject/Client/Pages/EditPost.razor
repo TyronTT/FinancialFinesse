@@ -1,0 +1,94 @@
+﻿@page "/edit/{PostId}"
+@inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+@inject NavigationManager NavigationManager
+@using Markdig
+
+<h3>Edit Blog Post</h3>
+
+<EditForm Model="@editingPost" OnValidSubmit="UpdateBlogPost">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="author">Author</label>
+        <InputText id="author" @bind-Value="editingPost.Author" class="form-control" />
+        <ValidationMessage For="@(() => editingPost.Author)" />
+    </div>
+
+    <div class="form-group">
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="editingPost.Title" class="form-control" />
+        <ValidationMessage For="@(() => editingPost.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label for="url">Url</label>
+        <InputText id="url" @bind-Value="editingPost.Url" class="form-control" />
+        <ValidationMessage For="@(() => editingPost.Url)" />
+    </div>
+
+    <div class="form-control-file">
+        <label for="image">Image</label>
+        <InputFile OnChange="OnFileChange" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="editingPost.Description" class="form-control" />
+        <ValidationMessage For="@(() => editingPost.Description)" />
+    </div>
+
+    <div class="form-group">
+        <label for="content">Content</label>
+        <BlogTextArea id="content" @bind-Value="editingPost.Content" class="form-control" />
+        <ValidationMessage For="@(() => editingPost.Content)" />
+    </div>
+
+    <div class="form-group">
+        <label for="contentPreview">Content Preview</label>
+        <div id="contentPreview" style="height: 100%" class="form-control">@((MarkupString)Markdown.ToHtml(editingPost.Content))</div>
+    </div>
+
+    <div class="form-group">
+        <label for="date">Date</label>
+        <InputDate id="date" @bind-Value="editingPost.DateCreated" class="form-control" />
+    </div>
+
+    <div class="form-check">
+        <InputCheckbox id="isPublished" @bind-Value="editingPost.IsPublished" class="form-check-input" />
+        <label for="isPublished">Publish</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <ValidationSummary />
+</EditForm>
+
+@code {
+    [Parameter]
+    public string PostId { get; set; }
+
+    fInancialFinesseProject.Shared.Domain.BlogPost editingPost = new fInancialFinesseProject.Shared.Domain.BlogPost();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(PostId) && int.TryParse(PostId, out var id))
+        {
+            editingPost = await BlogService.GetBlogPostById(id);
+        }
+    }
+
+    async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        var resizedImage = await e.File.RequestImageFileAsync(format, 1060, 1060);
+        var buffer = new byte[resizedImage.Size];
+        await resizedImage.OpenReadStream().ReadAsync(buffer);
+        var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        editingPost.Image = imageData; // Update the editingPost object
+    }
+
+    async Task UpdateBlogPost()
+    {
+        await BlogService.UpdateBlogPost(editingPost);
+        NavigationManager.NavigateTo($"/posts/{editingPost.Url}"); // Redirect using the updated URL
+    }
+}

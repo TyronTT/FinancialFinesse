@@ -43,5 +43,19 @@ namespace fInancialFinesseProject.Client.Services
         {
             return await _http.GetFromJsonAsync<List<BlogPost>>($"api/Blog");
         }
+
+        public async Task DeleteBlogPost(int id)
+        {
+            await _http.DeleteAsync($"api/Blog/{id}");
+        }
+        public async Task<BlogPost> GetBlogPostById(int id)
+        {
+            return await _http.GetFromJsonAsync<BlogPost>($"api/Blog/{id}");
+        }
+
+        public async Task UpdateBlogPost(BlogPost request)
+        {
+            await _http.PutAsJsonAsync($"api/Blog/{request.Id}", request);
+        }
     }
 }

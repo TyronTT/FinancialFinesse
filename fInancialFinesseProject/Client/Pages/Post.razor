@@ -1,6 +1,7 @@
 ﻿@page "/posts/{url}"
 @inject fInancialFinesseProject.Client.Services.IBlogService BlogService
 @using Markdig
+@inject IJSRuntime JSRuntime
 
 @if (CurrentPost == null)
 {
@@ -16,6 +17,10 @@ else
     <div>
         @((MarkupString)Markdown.ToHtml(CurrentPost.Content))
     </div>
+
+    <button @onclick="NavigateToEdit">Edit Post</button>
+
+    <button @onclick="ConfirmDelete">Delete Post</button>
 }
 
 @code {
@@ -26,8 +31,31 @@ else
 
     string placeholderImage = "https://loremflickr.com/1060/300";
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         CurrentPost = await BlogService.GetBlogPostByUrl(Url);
+    }
+
+    private void NavigateToEdit()
+    {
+        NavigationManager.NavigateTo($"/edit/{CurrentPost.Id}");
+    }
+
+    private async Task ConfirmDelete()
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Are you sure you want to delete this Blog?" });
+        if (confirmed)
+        {
+            await DeletePost();
+        }
+    }
+
+    private async Task DeletePost()
+    {
+        await BlogService.DeleteBlogPost(CurrentPost.Id);
+        NavigationManager.NavigateTo("/");
     }
 }
