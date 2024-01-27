@@ -1,6 +1,7 @@
 ﻿@page "/forums/{url}"
 @inject fInancialFinesseProject.Client.Services2.IForumService ForumService
 @using Markdig
+@inject IJSRuntime JSRuntime
 
 @if (CurrentPost == null)
 {
@@ -15,6 +16,10 @@ else
     <div>
         @((MarkupString)Markdown.ToHtml(CurrentPost.Content))
     </div>
+
+    <button @onclick="NavigateToEdit">Edit Post</button>
+
+    <button @onclick="ConfirmDelete">Delete Post</button>
 }
 
 @code {
@@ -23,8 +28,31 @@ else
     [Parameter]
     public string Url { get; set; }
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         CurrentPost = await ForumService.GetForumPostbyUrl(Url);
+    }
+
+    private void NavigateToEdit()
+    {
+        NavigationManager.NavigateTo($"/editforum/{CurrentPost.Id}");
+    }
+
+    private async Task ConfirmDelete()
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Are you sure you want to delete this Blog?" });
+        if (confirmed)
+        {
+            await DeleteForum();
+        }
+    }
+
+    private async Task DeleteForum()
+    {
+        await ForumService.DeleteForumPost(CurrentPost.Id);
+        NavigationManager.NavigateTo("/forums");
     }
 }

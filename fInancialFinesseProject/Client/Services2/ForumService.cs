@@ -40,5 +40,19 @@ namespace fInancialFinesseProject.Client.Services2
         {
             return await _http.GetFromJsonAsync<List<ForumPost>>("api/Forum");
         }
+
+        public async Task DeleteForumPost(int id)
+        {
+            await _http.DeleteAsync($"api/Forum/{id}");
+        }
+        public async Task<ForumPost> GetForumPostById(int id)
+        {
+            return await _http.GetFromJsonAsync<ForumPost>($"api/Forum/{id}");
+        }
+
+        public async Task UpdateForumPost(ForumPost request)
+        {
+            await _http.PutAsJsonAsync($"api/Forum/{request.Id}", request);
+        }
     }
 }

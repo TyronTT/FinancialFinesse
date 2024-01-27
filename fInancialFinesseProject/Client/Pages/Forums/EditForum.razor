@@ -1,0 +1,94 @@
+﻿@page "/editforum/{PostId}"
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+@inject NavigationManager NavigationManager
+@using Markdig
+
+<h3>Edit Forum Post</h3>
+
+<EditForm Model="@editingForum" OnValidSubmit="UpdateForumPost">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="author">Author</label>
+        <InputText id="author" @bind-Value="editingForum.Author" class="form-control" />
+        <ValidationMessage For="@(() => editingForum.Author)" />
+    </div>
+
+    <div class="form-group">
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="editingForum.Title" class="form-control" />
+        <ValidationMessage For="@(() => editingForum.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label for="url">Url</label>
+        <InputText id="url" @bind-Value="editingForum.Url" class="form-control" />
+        <ValidationMessage For="@(() => editingForum.Url)" />
+    </div>
+
+    <div class="form-control-file">
+        <label for="image">Image</label>
+        <InputFile OnChange="OnFileChange" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="editingForum.Description" class="form-control" />
+        <ValidationMessage For="@(() => editingForum.Description)" />
+    </div>
+
+    <div class="form-group">
+        <label for="content">Content</label>
+        <BlogTextArea id="content" @bind-Value="editingForum.Content" class="form-control" />
+        <ValidationMessage For="@(() => editingForum.Content)" />
+    </div>
+
+    <div class="form-group">
+        <label for="contentPreview">Content Preview</label>
+        <div id="contentPreview" style="height: 100%" class="form-control">@((MarkupString)Markdown.ToHtml(editingForum.Content))</div>
+    </div>
+
+    <div class="form-group">
+        <label for="date">Date</label>
+        <InputDate id="date" @bind-Value="editingForum.DateCreated" class="form-control" />
+    </div>
+
+    <div class="form-check">
+        <InputCheckbox id="isPublished" @bind-Value="editingForum.IsPublished" class="form-check-input" />
+        <label for="isPublished">Publish</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <ValidationSummary />
+</EditForm>
+
+@code {
+    [Parameter]
+    public string PostId { get; set; }
+
+    fInancialFinesseProject.Shared.ForumPost editingForum = new fInancialFinesseProject.Shared.ForumPost();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(PostId) && int.TryParse(PostId, out var id))
+        {
+            editingForum = await ForumService.GetForumPostById(id);
+        }
+    }
+
+    async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        var resizedImage = await e.File.RequestImageFileAsync(format, 1060, 1060);
+        var buffer = new byte[resizedImage.Size];
+        await resizedImage.OpenReadStream().ReadAsync(buffer);
+        var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        editingForum.Image = imageData; // Update the editingPost object
+    }
+
+    async Task UpdateForumPost()
+    {
+        await ForumService.UpdateForumPost(editingForum);
+        NavigationManager.NavigateTo($"/forums/{editingForum.Url}"); // Redirect using the updated URL
+    }
+}
