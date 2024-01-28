@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Reflection.Metadata.Ecma335;
+using System.Xml.Linq;
 
 namespace fInancialFinesseProject.Client.Services
 {
@@ -56,6 +57,44 @@ namespace fInancialFinesseProject.Client.Services
         public async Task UpdateBlogPost(BlogPost request)
         {
             await _http.PutAsJsonAsync($"api/Blog/{request.Id}", request);
+        }
+
+        public async Task<BlogComment> AddComment(BlogComment comment)
+        {
+            var response = await _http.PostAsJsonAsync("api/Blog/AddComment", comment);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Adding Comment: {errorMessage}");
+                throw new HttpRequestException($"Error Adding Comment: {response.StatusCode} - {errorMessage}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<BlogComment>();
+        }
+
+        public async Task<List<BlogComment>> GetCommentsByBlogPostId(int blogPostId)
+        {
+            var response = await _http.GetAsync($"api/Blog/GetComments/{blogPostId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle the response accordingly
+                Console.WriteLine($"Error: {response.StatusCode}");
+                return new List<BlogComment>(); // or throw an exception
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<BlogComment>>();
+        }
+
+        public async Task UpdateComment(BlogComment comment)
+        {
+            var response = await _http.PutAsJsonAsync($"api/Blog/UpdateComment/{comment.Id}", comment);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task DeleteComment(int commentId)
+        {
+            var response = await _http.DeleteAsync($"api/Blog/DeleteComment/{commentId}");
+            response.EnsureSuccessStatusCode();
         }
     }
 }

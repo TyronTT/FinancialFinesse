@@ -96,5 +96,32 @@ namespace fInancialFinesseProject.Server.Controllers
 
             return Ok(post);
         }
+
+        [HttpPost("AddComment")]
+        public async Task<ActionResult<BlogComment>> AddComment(BlogComment comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            comment.BlogPost = _context.BlogPosts.Find(comment.BlogPostId);
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+            return Ok(comment);
+        }
+
+        [HttpGet("GetComments/{blogPostId}")]
+        public ActionResult<List<BlogComment>> GetCommentsByBlogPostId(int blogPostId)
+        {
+            var comments = _context.Comments.Where(c => c.BlogPostId == blogPostId).OrderByDescending(c => c.DatePosted).ToList();
+
+            if (!comments.Any())
+            {
+                return NotFound("No comments found for this post.");
+            }
+
+            return Ok(comments);
+        }
     }
 }

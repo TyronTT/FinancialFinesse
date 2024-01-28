@@ -26,6 +26,7 @@ namespace fInancialFinesseProject.Server.Data
         }
 
         public DbSet<BlogPost> BlogPosts { get; set; }
+        public DbSet<BlogComment> Comments { get; set; }
     }
 
     public class ForumDataContext : DbContext
