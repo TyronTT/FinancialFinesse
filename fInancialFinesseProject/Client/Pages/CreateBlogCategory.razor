@@ -1,0 +1,30 @@
+﻿@page "/blogcategories/create-blogcategory"
+@inject IJSRuntime js
+@attribute [Authorize]
+@using fInancialFinesseProject.Shared.Domain
+@inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+@inject NavigationManager NavigationManager
+
+<h3>Create New Blog Category</h3>
+
+<EditForm Model="newCategory" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="categoryName">Category Name:</label>
+        <InputText id="categoryName" class="form-control" @bind-Value="newCategory.Name" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+</EditForm>
+
+@code {
+    private BlogCategory newCategory = new BlogCategory();
+
+    private async Task HandleValidSubmit()
+    {
+        await BlogService.CreateCategory(newCategory);
+        NavigationManager.NavigateTo("/blogcategories");
+    }
+}

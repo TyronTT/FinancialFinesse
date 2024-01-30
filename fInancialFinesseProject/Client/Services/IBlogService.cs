@@ -27,5 +27,10 @@ namespace fInancialFinesseProject.Client.Services
 
         Task<BlogComment> GetCommentById(int commentId);
 
+        Task<List<BlogCategory>> GetCategories();
+        Task<BlogCategory> CreateCategory(BlogCategory category);
+        Task UpdateCategory(BlogCategory category);
+        Task DeleteCategory(int categoryId);
+        Task<BlogCategory> GetCategoryById(int categoryId);
     }
 }

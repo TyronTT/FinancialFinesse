@@ -1,0 +1,44 @@
+﻿@page "/blogcategories/edit/{Id:int}"
+@inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+@inject NavigationManager NavigationManager
+@using fInancialFinesseProject.Shared.Domain
+@attribute [Authorize]
+
+<h3>Edit Blog Category</h3>
+
+@if (category != null)
+{
+    <EditForm Model="category" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="categoryName">Category Name:</label>
+            <InputText id="categoryName" class="form-control" @bind-Value="category.Name" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private BlogCategory category;
+
+    protected override async Task OnInitializedAsync()
+    {
+        category = await BlogService.GetCategoryById(Id);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await BlogService.UpdateCategory(category);
+        NavigationManager.NavigateTo("/blogcategories");
+    }
+}

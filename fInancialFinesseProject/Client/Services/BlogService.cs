@@ -1,6 +1,7 @@
 ﻿using fInancialFinesseProject.Shared.Domain;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Net.Http.Json;
 using System.Reflection.Metadata.Ecma335;
 using System.Xml.Linq;
@@ -107,6 +108,32 @@ namespace fInancialFinesseProject.Client.Services
         public async Task<BlogComment> GetCommentById(int commentId)
         {
             return await _http.GetFromJsonAsync<BlogComment>($"api/Blog/GetCommentById/{commentId}");
+        }
+
+        public async Task<List<BlogCategory>> GetCategories()
+        {
+            return await _http.GetFromJsonAsync<List<BlogCategory>>("api/Blog/categories");
+        }
+
+        public async Task<BlogCategory> CreateCategory(BlogCategory category)
+        {
+            var response = await _http.PostAsJsonAsync("api/Blog/categories", category);
+            return await response.Content.ReadFromJsonAsync<BlogCategory>();
+        }
+
+        public async Task UpdateCategory(BlogCategory category)
+        {
+            await _http.PutAsJsonAsync($"api/Blog/categories/{category.Id}", category);
+        }
+
+        public async Task DeleteCategory(int categoryId)
+        {
+            await _http.DeleteAsync($"api/Blog/categories/{categoryId}");
+        }
+
+        public async Task<BlogCategory> GetCategoryById(int categoryId)
+        {
+            return await _http.GetFromJsonAsync<BlogCategory>($"api/Blog/categories/{categoryId}");
         }
     }
 }

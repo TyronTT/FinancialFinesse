@@ -30,7 +30,7 @@ namespace fInancialFinesseProject.Shared.Domain
 
         [Required, StringLength(20)]
         public string Url { get; set; }
-
         public String Image { get; set; }
+        public string Category { get; set; } = "Uncategorized"; // Default value
     }
 }
