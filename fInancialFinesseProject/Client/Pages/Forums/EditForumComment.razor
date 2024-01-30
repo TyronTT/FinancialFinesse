@@ -1,0 +1,66 @@
+﻿@page "/edit-fcomment/{CommentId}"
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+@inject NavigationManager NavigationManager
+@using fInancialFinesseProject.Shared
+@inject IJSRuntime JSRuntime
+
+<h3>EditForumComment</h3>
+
+@if(comment != null)
+{
+    <EditForm Model="comment" OnValidSubmit="HandleValidSubmit">
+        <div class="form-group">
+            <label for="text">Comment Text</label>
+            <InputTextArea id="text" class="form-control" @bind-Value="comment.Text" rows="4"></InputTextArea>
+        </div>
+        <button type="submit" class="btn btn-success">Update Comment</button>
+        <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    private int _commentId;
+    private int _forumPostId; // Declare the _forumPostId variable
+
+
+
+    [Parameter]
+    public string CommentId
+    {
+        get => _commentId.ToString();
+        set
+        {
+            if (int.TryParse(value, out var result))
+            {
+                _commentId = result;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid comment ID");
+            }
+        }
+    }
+
+    private ForumComment comment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        comment = await ForumService.GetCommentById(_commentId);
+        if (comment != null)
+        {
+            _forumPostId = comment.ForumPostId; // Store BlogPostId
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        comment.ForumPostId = _forumPostId; // Use the stored BlogPostId
+        await ForumService.UpdateComment(comment);
+        NavigationManager.NavigateTo($"/forums/{_forumPostId}");
+    }
+
+    private async Task Cancel()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
+}

@@ -13,10 +13,12 @@ namespace fInancialFinesseProject.Server.Controllers
     public class ForumController : ControllerBase
     {
         private readonly ForumDataContext _context;
+        private readonly ILogger<ForumController> _logger;
 
-        public ForumController(ForumDataContext context) 
+        public ForumController(ForumDataContext context, ILogger<ForumController> logger) 
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -96,6 +98,83 @@ namespace fInancialFinesseProject.Server.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(post);
+        }
+
+        [HttpPost("AddComment")]
+        public async Task<ActionResult<ForumComment>> AddComment(ForumComment comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            comment.ForumPost = _context.ForumPosts.Find(comment.ForumPostId);
+            _context.forumComments.Add(comment);
+            await _context.SaveChangesAsync();
+            return Ok(comment);
+        }
+
+        [HttpGet("GetComments/{forumPostId}")]
+        public ActionResult<List<ForumComment>> GetCommentsByForumPostId(int forumPostId)
+        {
+            var comments = _context.forumComments.Where(c => c.ForumPostId == forumPostId).OrderByDescending(c => c.DatePosted).ToList();
+
+            if (!comments.Any())
+            {
+                return NotFound("No comments found for this post.");
+            }
+
+            return Ok(comments);
+        }
+
+        [HttpPut("UpdateComment/{id}")]
+        public async Task<IActionResult> UpdateComment(int id, [FromBody] ForumComment comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var existingComment = await _context.forumComments.FindAsync(id);
+            if (existingComment == null)
+            {
+                return NotFound();
+            }
+
+            existingComment.Text = comment.Text;
+            existingComment.ForumPostId = comment.ForumPostId;
+
+            _context.Entry(existingComment).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("DeleteComment/{id}")]
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            var comment = _context.forumComments.Find(id);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            _context.forumComments.Remove(comment);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpGet("GetCommentById/{id}")]
+        public async Task<ActionResult<ForumComment>> GetCommentById(int id)
+        {
+            var comment = await _context.forumComments.FindAsync(id);
+            if (comment == null)
+            {
+                _logger.LogInformation($"Comment not found with ID: {id}");
+                return NotFound();
+            }
+            _logger.LogInformation($"Fetched comment: {comment.Id}, Author: {comment.Author}, Text: {comment.Text}");
+            return Ok(comment);
         }
     }
 }

@@ -2,6 +2,7 @@
 @inject fInancialFinesseProject.Client.Services2.IForumService ForumService
 @using Markdig
 @inject IJSRuntime JSRuntime
+@using fInancialFinesseProject.Shared
 
 @if (CurrentPost == null)
 {
@@ -20,10 +21,46 @@ else
     <button @onclick="NavigateToEdit">Edit Post</button>
 
     <button @onclick="ConfirmDelete">Delete Post</button>
+
+    <div class="comments-section">
+        <h3>Comments</h3>
+        @if (comments.Any())
+        {
+            foreach (var comment in comments)
+            {
+                @*<div class="comment">
+                    <p><strong>@comment.Author</strong> - @comment.DatePosted.ToString("dd MMM yyyy")</p>
+                <p>@comment.Text</p>
+                </div>*@
+                <p><strong>@comment.Author</strong> - @comment.DatePosted.ToString("dd MMM yyyy")</p>
+                <p>@comment.Text</p>
+                <button @onclick="() => EditComment(comment)">Edit</button>
+                <button @onclick="() => DeleteComment(comment.Id)">Delete</button>
+            }
+        }
+        else
+        {
+            <p>No comments yet. Be the first to comment!</p>
+        }
+
+        <EditForm Model="newComment" OnValidSubmit="AddComment">
+            <div class="form-group">
+                <label for="author">Name:</label>
+                <InputText id="author" class="form-control" @bind-Value="newComment.Author" />
+            </div>
+            <div class="form-group">
+                <label for="comment">Comment:</label>
+                <InputTextArea id="comment" class="form-control" @bind-Value="newComment.Text" rows="3"></InputTextArea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </EditForm>
+    </div>
 }
 
 @code {
     private fInancialFinesseProject.Shared.ForumPost CurrentPost;
+    private List<ForumComment> comments = new List<ForumComment>();
+    private ForumComment newComment = new ForumComment();
 
     [Parameter]
     public string Url { get; set; }
@@ -33,6 +70,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadForumPost();
+        await LoadComments();
+    }
+
+    private async Task LoadForumPost()
+    {
+        // Logic to load the blog post
         CurrentPost = await ForumService.GetForumPostbyUrl(Url);
     }
 
@@ -54,5 +98,41 @@ else
     {
         await ForumService.DeleteForumPost(CurrentPost.Id);
         NavigationManager.NavigateTo("/forums");
+    }
+
+    private async Task LoadComments()
+    {
+        comments = await ForumService.GetCommentsByForumPostId(CurrentPost.Id);
+    }
+
+    private async Task AddComment()
+    {
+        @*newComment.BlogPostId = CurrentPost.Id; // Ensure the comment is associated with the current post
+        await BlogService.AddComment(newComment);
+        newComment = new BlogComment(); // Reset the comment
+        await LoadComments(); // Reload comments*@
+
+        newComment.ForumPost = CurrentPost; // Make sure CurrentPost is the correct BlogPost object
+                                           // Or set only the required fields
+        newComment.ForumPostId = CurrentPost.Id; // If only the ID is sufficient
+
+        await ForumService.AddComment(newComment);
+        newComment = new ForumComment(); // Reset the comment
+        await LoadComments(); // Reload comments
+    }
+
+    private async Task DeleteComment(int commentId)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this comment?");
+        if (confirmed)
+        {
+            await ForumService.DeleteComment(commentId);
+            await LoadComments();
+        }
+    }
+
+    private void EditComment(ForumComment comment)
+    {
+        NavigationManager.NavigateTo($"/edit-fcomment/{comment.Id}");
     }
 }

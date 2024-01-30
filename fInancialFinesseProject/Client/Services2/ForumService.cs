@@ -54,5 +54,55 @@ namespace fInancialFinesseProject.Client.Services2
         {
             await _http.PutAsJsonAsync($"api/Forum/{request.Id}", request);
         }
+
+        public async Task<ForumComment> AddComment(ForumComment comment)
+        {
+            comment.ForumPost = null;
+            var response = await _http.PostAsJsonAsync("api/Forum/AddComment", comment);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Adding Comment: {errorMessage}");
+                throw new HttpRequestException($"Error Adding Comment: {response.StatusCode} - {errorMessage}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<ForumComment>();
+        }
+
+        public async Task<List<ForumComment>> GetCommentsByForumPostId(int forumPostId)
+        {
+            var response = await _http.GetAsync($"api/Forum/GetComments/{forumPostId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle the response accordingly
+                Console.WriteLine($"Error: {response.StatusCode}");
+                return new List<ForumComment>(); // or throw an exception
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<ForumComment>>();
+        }
+
+        public async Task UpdateComment(ForumComment comment)
+        {
+            var response = await _http.PutAsJsonAsync($"api/Forum/UpdateComment/{comment.Id}", comment);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Updating Comment: {errorMessage}");
+                throw new HttpRequestException($"Error Updating Comment: {response.StatusCode} - {errorMessage}");
+            }
+        }
+
+        public async Task DeleteComment(int commentId)
+        {
+            var response = await _http.DeleteAsync($"api/Forum/DeleteComment/{commentId}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<ForumComment> GetCommentById(int commentId)
+        {
+            return await _http.GetFromJsonAsync<ForumComment>($"api/Forum/GetCommentById/{commentId}");
+        }
     }
 }

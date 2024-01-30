@@ -2,6 +2,7 @@
 
 
 using fInancialFinesseProject.Shared;
+using fInancialFinesseProject.Shared.Domain;
 
 namespace fInancialFinesseProject.Client.Services2
 {
@@ -13,5 +14,19 @@ namespace fInancialFinesseProject.Client.Services2
         Task DeleteForumPost(int id);
         Task<ForumPost> GetForumPostById(int id);
         Task UpdateForumPost(ForumPost forumPost);
+
+        // Add a new comment
+        Task<ForumComment> AddComment(ForumComment comment);
+
+        // Retrieve comments for a specific blog post
+        Task<List<ForumComment>> GetCommentsByForumPostId(int ForumPostId);
+
+        // Update a comment
+        Task UpdateComment(ForumComment comment);
+
+        // Delete a comment
+        Task DeleteComment(int commentId);
+
+        Task<ForumComment> GetCommentById(int commentId);
     }
 }

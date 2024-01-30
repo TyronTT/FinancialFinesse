@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using fInancialFinesseProject.Server.Data;
 
@@ -10,9 +11,11 @@ using fInancialFinesseProject.Server.Data;
 namespace fInancialFinesseProject.Server.Migrations.ForumData
 {
     [DbContext(typeof(ForumDataContext))]
-    partial class ForumDataContextModelSnapshot : ModelSnapshot
+    [Migration("20240130022104_AddFComments")]
+    partial class AddFComments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.12");
