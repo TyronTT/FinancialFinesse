@@ -1,0 +1,70 @@
+﻿@page "/edit-comment/{CommentId}"
+@inject fInancialFinesseProject.Client.Services.IBlogService BlogService
+@inject NavigationManager NavigationManager
+@using fInancialFinesseProject.Shared.Domain
+@inject IJSRuntime JSRuntime
+
+<h3>Edit Comment</h3>
+
+@if (comment != null)
+{
+    <EditForm Model="comment" OnValidSubmit="HandleValidSubmit">
+        <div class="form-group">
+            <label for="text">Comment Text:</label>
+            <InputTextArea id="text" class="form-control" @bind-Value="comment.Text" rows="4"></InputTextArea>
+        </div>
+        <button type="submit" class="btn btn-success">Update Comment</button>
+        <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private int _commentId;
+    private int _blogPostId; // Declare the _blogPostId variable
+    
+
+
+    [Parameter]
+    public string CommentId
+    {
+        get => _commentId.ToString();
+        set
+        {
+            if (int.TryParse(value, out var result))
+            {
+                _commentId = result;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid comment ID");
+            }
+        }
+    }
+
+    private BlogComment comment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        comment = await BlogService.GetCommentById(_commentId);
+        if (comment != null)
+        {
+            _blogPostId = comment.BlogPostId; // Store BlogPostId
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        comment.BlogPostId = _blogPostId; // Use the stored BlogPostId
+        await BlogService.UpdateComment(comment);
+        NavigationManager.NavigateTo($"/posts/{_blogPostId}");
+    }
+
+    private async Task Cancel()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
+}

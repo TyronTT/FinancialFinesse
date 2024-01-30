@@ -25,5 +25,7 @@ namespace fInancialFinesseProject.Client.Services
         // Delete a comment
         Task DeleteComment(int commentId);
 
+        Task<BlogComment> GetCommentById(int commentId);
+
     }
 }

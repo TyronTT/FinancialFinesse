@@ -61,6 +61,7 @@ namespace fInancialFinesseProject.Client.Services
 
         public async Task<BlogComment> AddComment(BlogComment comment)
         {
+            comment.BlogPost = null;
             var response = await _http.PostAsJsonAsync("api/Blog/AddComment", comment);
             if (!response.IsSuccessStatusCode)
             {
@@ -88,13 +89,24 @@ namespace fInancialFinesseProject.Client.Services
         public async Task UpdateComment(BlogComment comment)
         {
             var response = await _http.PutAsJsonAsync($"api/Blog/UpdateComment/{comment.Id}", comment);
-            response.EnsureSuccessStatusCode();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error Updating Comment: {errorMessage}");
+                throw new HttpRequestException($"Error Updating Comment: {response.StatusCode} - {errorMessage}");
+            }
         }
 
         public async Task DeleteComment(int commentId)
         {
             var response = await _http.DeleteAsync($"api/Blog/DeleteComment/{commentId}");
             response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<BlogComment> GetCommentById(int commentId)
+        {
+            return await _http.GetFromJsonAsync<BlogComment>($"api/Blog/GetCommentById/{commentId}");
         }
     }
 }
