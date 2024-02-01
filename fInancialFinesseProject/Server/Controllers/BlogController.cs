@@ -86,12 +86,16 @@ namespace fInancialFinesseProject.Server.Controllers
             post.Author = request.Author;
             post.Title = request.Title;
             post.Url = request.Url;
+            post.CategoryId = request.CategoryId;
+            post.Category = request.Category;
             post.Description = request.Description;
             post.Image = request.Image;
             post.Content = request.Content;
             post.DateCreated = request.DateCreated;
             post.IsPublished = request.IsPublished;
             // Update other properties as needed
+
+            Console.WriteLine(post.Category);
 
             _context.Entry(post).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -232,5 +236,7 @@ namespace fInancialFinesseProject.Server.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
     }
 }

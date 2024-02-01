@@ -14,7 +14,7 @@ namespace fInancialFinesseProject.Client.Services
 
         public BlogService(HttpClient http)
         {
-                _http = http;
+            _http = http;
         }
 
         public async Task<BlogPost> CreateNewBlogPost(BlogPost request)
