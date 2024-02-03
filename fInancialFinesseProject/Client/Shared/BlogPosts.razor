@@ -1,10 +1,11 @@
 ﻿@using fInancialFinesseProject.Shared.Domain
 @inject fInancialFinesseProject.Client.Services.IBlogService BlogService
-    
-@foreach(var post in Posts)
+
+<input type="text" @bind="searchTerm" placeholder="Search by category..." class="form-control mb-3" />
+
+@foreach (var post in FilteredPosts)
 {
     <div class="card my-4">
-        @*<div class="card-img" style="background-image: url('@(post.Image ?? placeholderImage)');"></div>*@
         <div>
             <img src="@post.Image" width="200" />
         </div>
@@ -20,6 +21,7 @@
 
 @code {
     private List<BlogPost> Posts = new List<BlogPost>();
+    private string searchTerm = string.Empty;
 
     string placeholderImage = "https://loremflickr.com/1060/180";
 
@@ -27,4 +29,9 @@
     {
         Posts = await BlogService.GetBlogPosts();
     }
+
+    private IEnumerable<BlogPost> FilteredPosts =>
+        string.IsNullOrWhiteSpace(searchTerm) ?
+        Posts :
+        Posts.Where(post => post.Category?.ToLower().Contains(searchTerm.ToLower()) ?? false);
 }

@@ -1,7 +1,9 @@
 ﻿@using fInancialFinesseProject.Shared
 @inject fInancialFinesseProject.Client.Services2.IForumService ForumService
 
-@foreach(var post in Posts)
+<input type="text" @bind="searchTerm" placeholder="Search by category..." class="form-control mb-3" />
+
+@foreach(var post in FilteredPosts)
 {
 
     <div class="card my-4">
@@ -36,10 +38,16 @@
 
 @code {
     private List<ForumPost> Posts = new List<ForumPost>();
+    private string searchTerm = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         Posts = await ForumService.GetForumPosts();
     }
+
+    private IEnumerable<ForumPost> FilteredPosts =>
+        string.IsNullOrWhiteSpace(searchTerm) ?
+        Posts :
+        Posts.Where(post => post.Category?.ToLower().Contains(searchTerm.ToLower()) ?? false);
 }
 
