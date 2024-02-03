@@ -22,6 +22,13 @@ else
 
     <button @onclick="ConfirmDelete">Delete Post</button>
 
+    <div>
+        @if (specificCategory != null)
+        {
+            <h3>@specificCategory.Name (ID: @specificCategory.Id)</h3>
+        }
+    </div>
+
     <div class="comments-section">
         <h3>Comments</h3>
         @if (comments.Any())
@@ -61,6 +68,7 @@ else
     private fInancialFinesseProject.Shared.ForumPost CurrentPost;
     private List<ForumComment> comments = new List<ForumComment>();
     private ForumComment newComment = new ForumComment();
+    private ForumCategory specificCategory;
 
     [Parameter]
     public string Url { get; set; }
@@ -134,5 +142,12 @@ else
     private void EditComment(ForumComment comment)
     {
         NavigationManager.NavigateTo($"/edit-fcomment/{comment.Id}");
+    }
+
+    private async Task LoadSpecificCategory()
+    {
+        int test = 1; // Assuming you have the ID you want to search for
+                      // You need a method in your BlogService to fetch a category by ID
+        specificCategory = await ForumService.GetCategoryById(test);
     }
 }

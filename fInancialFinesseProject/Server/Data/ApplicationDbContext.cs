@@ -39,5 +39,6 @@ namespace fInancialFinesseProject.Server.Data
 
         public DbSet<ForumPost> ForumPosts { get; set; }
         public DbSet<ForumComment> forumComments { get; set; }
+        public DbSet<ForumCategory> fCategories { get; set; }
     }
 }

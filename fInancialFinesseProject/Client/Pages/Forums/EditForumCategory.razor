@@ -1,0 +1,44 @@
+﻿@page "/forumcategories/edit/{Id:int}"
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+@inject NavigationManager NavigationManager
+@using fInancialFinesseProject.Shared
+@attribute [Authorize]
+
+<h3>Edit Forum Category</h3>
+
+@if (category != null)
+{
+    <EditForm Model="category" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="categoryName">Category Name:</label>
+            <InputText id="categoryName" class="form-control" @bind-Value="category.Name" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ForumCategory category;
+
+    protected override async Task OnInitializedAsync()
+    {
+        category = await ForumService.GetCategoryById(Id);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ForumService.UpdateCategory(category);
+        NavigationManager.NavigateTo("/forumcategories");
+    }
+}

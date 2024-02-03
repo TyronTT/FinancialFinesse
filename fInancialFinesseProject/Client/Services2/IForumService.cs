@@ -1,9 +1,5 @@
 ﻿using fInancialFinesseProject.Shared;
 
-
-using fInancialFinesseProject.Shared;
-using fInancialFinesseProject.Shared.Domain;
-
 namespace fInancialFinesseProject.Client.Services2
 {
     public interface IForumService
@@ -28,5 +24,10 @@ namespace fInancialFinesseProject.Client.Services2
         Task DeleteComment(int commentId);
 
         Task<ForumComment> GetCommentById(int commentId);
+        Task<List<ForumCategory>> GetCategories();
+        Task<ForumCategory> CreateCategory(ForumCategory category);
+        Task UpdateCategory(ForumCategory category);
+        Task DeleteCategory(int categoryId);
+        Task<ForumCategory> GetCategoryById(int categoryId);
     }
 }

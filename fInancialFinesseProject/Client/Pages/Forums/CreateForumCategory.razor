@@ -1,0 +1,31 @@
+﻿@page "/forumcategories/create-forumcategory"
+@inject IJSRuntime js
+@attribute [Authorize]
+@using fInancialFinesseProject.Shared
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+@inject NavigationManager NavigationManager
+
+
+<h3>Create New Forum Category</h3>
+
+<EditForm Model="newCategory" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="categoryName">Category Name:</label>
+        <InputText id="categoryName" class="form-control" @bind-Value="newCategory.Name" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+</EditForm>
+
+@code {
+    private ForumCategory newCategory = new ForumCategory();
+
+    private async Task HandleValidSubmit()
+    {
+        await ForumService.CreateCategory(newCategory);
+        NavigationManager.NavigateTo("/forumcategories");
+    }
+}

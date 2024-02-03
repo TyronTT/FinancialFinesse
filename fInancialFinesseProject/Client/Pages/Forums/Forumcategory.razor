@@ -1,0 +1,73 @@
+﻿@page "/forumcategories"
+@inject HttpClient _client
+@inject IJSRuntime js
+@attribute [Authorize]
+@using fInancialFinesseProject.Shared
+@inject fInancialFinesseProject.Client.Services2.IForumService ForumService
+
+<h3 class="card-title">Categories</h3>
+
+<a href="/forumcategories/create-forumcategory" class="btn btn-secondary">
+    <span class="oi oi-plus"></span>
+    Create New Category
+</a>
+<br />
+<br />
+
+@if (Categories == null)
+{
+    <div class="alert alert-info">Loading Categories...</div>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Category Id</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Categories)
+            {
+                <tr>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td>
+                        <a href="/forumcategories/edit/@category.Id" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <button class="btn btn-danger" @onclick="@(()=>Delete(category.Id))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ForumCategory>? Categories;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Categories = await ForumService.GetCategories();
+    }
+
+    async Task Delete(int categoryId)
+    {
+        if (Categories != null)
+        {
+            var category = Categories.First(c => c.Id == categoryId);
+            var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete the category '{category.Name}'?");
+            if (confirm)
+            {
+                await _client.DeleteAsync($"api/Forum/categories/{categoryId}");
+                Categories.Remove(category); // Update the local list without needing to reload from server
+                StateHasChanged(); // Notify the UI that the state has changed.
+            }
+        }
+    }
+}

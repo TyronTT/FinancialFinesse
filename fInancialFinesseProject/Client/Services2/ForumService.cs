@@ -1,5 +1,4 @@
 ﻿using fInancialFinesseProject.Shared;
-using fInancialFinesseProject.Shared.Domain;
 using System.Net.Http.Json;
 
 namespace fInancialFinesseProject.Client.Services2
@@ -14,8 +13,17 @@ namespace fInancialFinesseProject.Client.Services2
 
         public async Task<ForumPost> CreateNewForumPost(ForumPost request)
         {
-            var result = await _http.PostAsJsonAsync("api/Forum", request);
-            return await result.Content.ReadFromJsonAsync<ForumPost>();
+            var response = await _http.PostAsJsonAsync("api/Forum", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ForumPost>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException($"Error in CreateNewForumPost: {error}");
+            }
         }
 
         public async Task<ForumPost> GetForumPostbyUrl(string url)
@@ -52,6 +60,7 @@ namespace fInancialFinesseProject.Client.Services2
 
         public async Task UpdateForumPost(ForumPost request)
         {
+            Console.WriteLine($"Updating ForumPost with Category: {request.Category}");
             await _http.PutAsJsonAsync($"api/Forum/{request.Id}", request);
         }
 
@@ -103,6 +112,32 @@ namespace fInancialFinesseProject.Client.Services2
         public async Task<ForumComment> GetCommentById(int commentId)
         {
             return await _http.GetFromJsonAsync<ForumComment>($"api/Forum/GetCommentById/{commentId}");
+        }
+
+        public async Task<List<ForumCategory>> GetCategories()
+        {
+            return await _http.GetFromJsonAsync<List<ForumCategory>>("api/Forum/categories");
+        }
+
+        public async Task<ForumCategory> CreateCategory(ForumCategory category)
+        {
+            var response = await _http.PostAsJsonAsync("api/Forum/categories", category);
+            return await response.Content.ReadFromJsonAsync<ForumCategory>();
+        }
+
+        public async Task UpdateCategory(ForumCategory category)
+        {
+            await _http.PutAsJsonAsync($"api/Forum/categories/{category.Id}", category);
+        }
+
+        public async Task DeleteCategory(int categoryId)
+        {
+            await _http.DeleteAsync($"api/Forum/categories/{categoryId}");
+        }
+
+        public async Task<ForumCategory> GetCategoryById(int categoryId)
+        {
+            return await _http.GetFromJsonAsync<ForumCategory>($"api/Forum/categories/{categoryId}");
         }
     }
 }

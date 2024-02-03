@@ -1,6 +1,5 @@
 ﻿using fInancialFinesseProject.Server.Data;
 using fInancialFinesseProject.Shared;
-using fInancialFinesseProject.Shared.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,10 +41,24 @@ namespace fInancialFinesseProject.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<ForumPost>> CreateNewForumPost(ForumPost request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var category = await _context.fCategories
+                                        .FirstOrDefaultAsync(c => c.Id == request.CategoryId);
+            if (category == null)
+            {
+                return BadRequest("Invalid CategoryId");
+            }
+
+            request.Category = category.Name;
+
             _context.Add(request);
             await _context.SaveChangesAsync();
 
-            return request;
+            return CreatedAtAction(nameof(GetForumPostById), new { id = request.Id }, request);
         }
 
         [HttpDelete("{id}")]
@@ -77,6 +90,7 @@ namespace fInancialFinesseProject.Server.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ForumPost>> UpdateForumPost(int id, ForumPost request)
         {
+            Console.WriteLine($"Received Category to Update: {request.Category}");
             var post = _context.ForumPosts.FirstOrDefault(p => p.Id == id);
             if (post == null)
             {
@@ -87,12 +101,27 @@ namespace fInancialFinesseProject.Server.Controllers
             post.Author = request.Author;
             post.Title = request.Title;
             post.Url = request.Url;
+            post.CategoryId = request.CategoryId;
+            // Fetch the new category name based on CategoryId
+            var category = await _context.fCategories.FirstOrDefaultAsync(c => c.Id == request.CategoryId);
+            if (category != null)
+            {
+                post.Category = category.Name; // Update the category name
+            }
+            else
+            {
+                // Handle the case where the new CategoryId does not correspond to an existing category
+                Console.WriteLine("Invalid CategoryId provided.");
+                return BadRequest("Invalid CategoryId provided.");
+            }
             post.Description = request.Description;
             post.Image = request.Image;
             post.Content = request.Content;
             post.DateCreated = request.DateCreated;
             post.IsPublished = request.IsPublished;
             // Update other properties as needed
+
+            Console.WriteLine(post.Category);
 
             _context.Entry(post).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -175,6 +204,102 @@ namespace fInancialFinesseProject.Server.Controllers
             }
             _logger.LogInformation($"Fetched comment: {comment.Id}, Author: {comment.Author}, Text: {comment.Text}");
             return Ok(comment);
+        }
+
+        [HttpGet("categories")]
+        public ActionResult<List<ForumCategory>> GetCategories()
+        {
+            var categories = _context.fCategories.ToList();
+            return Ok(categories);
+        }
+
+        // Create a new category
+        [HttpPost("categories")]
+        public async Task<ActionResult<ForumCategory>> CreateCategory([FromBody] ForumCategory category)
+        {
+            _context.fCategories.Add(category);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
+        }
+
+        // Get a category by ID
+        [HttpGet("categories/{id}")]
+        public async Task<ActionResult<ForumCategory>> GetCategoryById(int id)
+        {
+            var category = await _context.fCategories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
+        }
+
+        // Update a category
+        [HttpPut("categories/{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] ForumCategory categoryUpdate)
+        {
+            //if (id != category.Id)
+            //{
+            //    return BadRequest();
+            //}
+
+            //_context.Entry(category).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            //await _context.SaveChangesAsync();
+            //return NoContent();
+
+            var category = await _context.fCategories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound("Category not found.");
+            }
+
+            if (id != categoryUpdate.Id)
+            {
+                return BadRequest("Mismatched Category ID.");
+            }
+
+            // Check if the category name is actually being updated to avoid unnecessary operations
+            if (category.Name != categoryUpdate.Name)
+            {
+                // Update the category name
+                category.Name = categoryUpdate.Name;
+
+                // Now, update all forum posts that are linked to this category
+                var postsToUpdate = await _context.ForumPosts.Where(p => p.CategoryId == id).ToListAsync();
+                foreach (var post in postsToUpdate)
+                {
+                    post.Category = categoryUpdate.Name;
+                }
+            }
+
+            // No need to set the entity state to Modified for tracked entities when their properties have been changed
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        // Delete a category
+        [HttpDelete("categories/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var category = await _context.fCategories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            // Find all blog posts associated with this category
+            var postsToUpdate = _context.ForumPosts.Where(p => p.CategoryId == id);
+
+            // Set the Category of affected posts to null or a default value
+            foreach (var post in postsToUpdate)
+            {
+                post.Category = "Uncategorized"; // Or set to a default category name if preferred
+                post.CategoryId = 0;
+            }
+
+            _context.fCategories.Remove(category);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }

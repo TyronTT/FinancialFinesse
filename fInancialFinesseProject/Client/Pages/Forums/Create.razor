@@ -2,6 +2,7 @@
 @inject fInancialFinesseProject.Client.Services2.IForumService ForumService
 @inject NavigationManager NavigationManager
 @using Markdig
+@using fInancialFinesseProject.Shared
 
 <h3>Create a new Forum</h3>
 
@@ -12,6 +13,21 @@
         <label for="author">Author</label>
         <InputText id="author" @bind-Value="newForumPost.Author" class="form-control" />
         <ValidationMessage For="@(() => newForumPost.Author)" />
+    </div>
+
+    <div class="form-group">
+        <label for="category">Category</label>
+        <InputSelect id="category" @bind-Value="newForumPost.CategoryId" class="form-control">
+            <option value="">-- Select Category --</option>
+            @if (categories != null)
+            {
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                    //newBlogPost.Category = category.Name;
+                }
+            }
+        </InputSelect>
     </div>
 
     <div class="form-group">
@@ -67,6 +83,13 @@
         {
             Image = ""
         };
+
+    private List<ForumCategory> categories; // Assuming Category is your model for categories
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await ForumService.GetCategories();
+    }
 
     async void CreateNewForumPost()
     {
