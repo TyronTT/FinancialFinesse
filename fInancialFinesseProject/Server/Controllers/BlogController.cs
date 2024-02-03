@@ -30,6 +30,7 @@ namespace fInancialFinesseProject.Server.Controllers
         public ActionResult<BlogPost> GimmeThatSingleBlogPost(string url)
         {
             var post = _context.BlogPosts.FirstOrDefault(p => p.Url.ToLower().Equals(url.ToLower()));
+
             if(post == null)
             {
                 return NotFound("This Post Does Not Exist.");
@@ -41,10 +42,24 @@ namespace fInancialFinesseProject.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<BlogPost>> CreateNewBlogPost(BlogPost request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var category = await _context.Categories
+                                        .FirstOrDefaultAsync(c => c.Id == request.CategoryId);
+            if (category == null)
+            {
+                return BadRequest("Invalid CategoryId");
+            }
+
+            request.Category = category.Name;
+
             _context.Add(request);
             await _context.SaveChangesAsync();
 
-            return request;
+            return CreatedAtAction(nameof(GetBlogPostById), new { id = request.Id }, request);
         }
 
         [HttpDelete("{id}")]
@@ -76,6 +91,7 @@ namespace fInancialFinesseProject.Server.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<BlogPost>> UpdateBlogPost(int id, BlogPost request)
         {
+            Console.WriteLine($"Received Category to Update: {request.Category}");
             var post = _context.BlogPosts.FirstOrDefault(p => p.Id == id);
             if (post == null)
             {
@@ -87,7 +103,18 @@ namespace fInancialFinesseProject.Server.Controllers
             post.Title = request.Title;
             post.Url = request.Url;
             post.CategoryId = request.CategoryId;
-            post.Category = request.Category;
+            // Fetch the new category name based on CategoryId
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == request.CategoryId);
+            if (category != null)
+            {
+                post.Category = category.Name; // Update the category name
+            }
+            else
+            {
+                // Handle the case where the new CategoryId does not correspond to an existing category
+                Console.WriteLine("Invalid CategoryId provided.");
+                return BadRequest("Invalid CategoryId provided.");
+            }
             post.Description = request.Description;
             post.Image = request.Image;
             post.Content = request.Content;
@@ -198,14 +225,14 @@ namespace fInancialFinesseProject.Server.Controllers
 
         // Get a category by ID
         [HttpGet("categories/{id}")]
-        public ActionResult<BlogCategory> GetCategoryById(int id)
+        public async Task<ActionResult<BlogCategory>> GetCategoryById(int id)
         {
-            var category = _context.Categories.Find(id);
+            var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
-            return category;
+            return Ok(category);
         }
 
         // Update a category

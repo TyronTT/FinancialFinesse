@@ -25,7 +25,7 @@
                 @foreach (var category in categories)
                 {
                     <option value="@category.Id">@category.Name</option>
-                    newBlogPost.Category = category.Name;
+                    //newBlogPost.Category = category.Name;
                 }
             }
         </InputSelect>
@@ -85,7 +85,8 @@
             Image = ""
         };
 
-    List<BlogCategory> categories; // Assuming Category is your model for categories
+    private List<BlogCategory> categories; // Assuming Category is your model for categories
+    //private IList<BlogCategory>? categories;
 
     protected override async Task OnInitializedAsync()
     {

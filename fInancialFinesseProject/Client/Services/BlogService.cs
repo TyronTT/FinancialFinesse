@@ -19,8 +19,17 @@ namespace fInancialFinesseProject.Client.Services
 
         public async Task<BlogPost> CreateNewBlogPost(BlogPost request)
         {
-            var result = await _http.PostAsJsonAsync("api/Blog", request);  
-            return await result.Content.ReadFromJsonAsync<BlogPost>();
+            var response = await _http.PostAsJsonAsync("api/Blog", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<BlogPost>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException($"Error in CreateNewBlogPost: {error}");
+            }
         }
 
         public async Task<BlogPost> GetBlogPostByUrl(string url)
@@ -57,6 +66,7 @@ namespace fInancialFinesseProject.Client.Services
 
         public async Task UpdateBlogPost(BlogPost request)
         {
+            Console.WriteLine($"Updating BlogPost with Category: {request.Category}");
             await _http.PutAsJsonAsync($"api/Blog/{request.Id}", request);
         }
 

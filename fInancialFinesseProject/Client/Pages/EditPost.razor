@@ -111,4 +111,17 @@
         await BlogService.UpdateBlogPost(editingPost);
         NavigationManager.NavigateTo($"/posts/{editingPost.Url}"); // Redirect using the updated URL
     }
+
+    @*private void HandleCategoryChange(ChangeEventArgs e)
+    {
+        var selectedCategoryId = Convert.ToInt32(e.Value.ToString());
+        editingPost.CategoryId = selectedCategoryId;
+
+        var selectedCategory = categories.FirstOrDefault(c => c.Id == selectedCategoryId);
+        if (selectedCategory != null)
+        {
+            editingPost.Category = selectedCategory.Name;
+            Console.WriteLine($"Selected Category: {editingPost.Category}");
+        }
+    }*@
 }
