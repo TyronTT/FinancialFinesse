@@ -237,14 +237,43 @@ namespace fInancialFinesseProject.Server.Controllers
 
         // Update a category
         [HttpPut("categories/{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] BlogCategory category)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] BlogCategory categoryUpdate)
         {
-            if (id != category.Id)
+            //if (id != category.Id)
+            //{
+            //    return BadRequest();
+            //}
+
+            //_context.Entry(category).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            //await _context.SaveChangesAsync();
+            //return NoContent();
+
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
-                return BadRequest();
+                return NotFound("Category not found.");
             }
 
-            _context.Entry(category).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            if (id != categoryUpdate.Id)
+            {
+                return BadRequest("Mismatched Category ID.");
+            }
+
+            // Check if the category name is actually being updated to avoid unnecessary operations
+            if (category.Name != categoryUpdate.Name)
+            {
+                // Update the category name
+                category.Name = categoryUpdate.Name;
+
+                // Now, update all blog posts that are linked to this category
+                var postsToUpdate = await _context.BlogPosts.Where(p => p.CategoryId == id).ToListAsync();
+                foreach (var post in postsToUpdate)
+                {
+                    post.Category = categoryUpdate.Name;
+                }
+            }
+
+            // No need to set the entity state to Modified for tracked entities when their properties have been changed
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -257,6 +286,16 @@ namespace fInancialFinesseProject.Server.Controllers
             if (category == null)
             {
                 return NotFound();
+            }
+
+            // Find all blog posts associated with this category
+            var postsToUpdate = _context.BlogPosts.Where(p => p.CategoryId == id);
+
+            // Set the Category of affected posts to null or a default value
+            foreach (var post in postsToUpdate)
+            {
+                post.Category = "Uncategorized"; // Or set to a default category name if preferred
+                post.CategoryId = 0; 
             }
 
             _context.Categories.Remove(category);
