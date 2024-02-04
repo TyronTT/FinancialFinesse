@@ -95,7 +95,7 @@ else
 
     private async Task ConfirmDelete()
     {
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Are you sure you want to delete this Blog?" });
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Are you sure you want to delete this Forum?" });
         if (confirmed)
         {
             await DeleteForum();
