@@ -65,6 +65,6 @@ else
 
     private async Task Cancel()
     {
-        await JSRuntime.InvokeVoidAsync("history.back");
+        NavigationManager.NavigateTo($"/posts/{_blogPostId}");
     }
 }

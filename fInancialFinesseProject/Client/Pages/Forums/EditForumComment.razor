@@ -61,6 +61,6 @@
 
     private async Task Cancel()
     {
-        await JSRuntime.InvokeVoidAsync("history.back");
+        NavigationManager.NavigateTo($"/forums/{_forumPostId}");
     }
 }
