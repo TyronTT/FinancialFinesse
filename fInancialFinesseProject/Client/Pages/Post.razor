@@ -83,6 +83,7 @@ else
     {
         await LoadBlogPost();
         await LoadComments();
+        //await LoadSpecificCategory();
     }
 
     private async Task LoadBlogPost()
@@ -140,7 +141,7 @@ else
         {
             await BlogService.DeleteComment(commentId);
             await LoadComments();
-            await LoadSpecificCategory();
+            //await LoadSpecificCategory();
         }
     }
 
