@@ -6,12 +6,12 @@ namespace fInancialFinesseProject.Client.Services2
     public class ForumService : IForumService
     {
         private readonly HttpClient _http;
-        public ForumService(HttpClient http) 
+        public ForumService(HttpClient http) //initializes the ForumService with an HttpClient for making HTTP requests.
         {
             _http = http;
         }
 
-        public async Task<ForumPost> CreateNewForumPost(ForumPost request)
+        public async Task<ForumPost> CreateNewForumPost(ForumPost request) //Asynchronously sends a POST request to create a new forum post and returns the created post if successful.
         {
             var response = await _http.PostAsJsonAsync("api/Forum", request);
 
@@ -26,7 +26,7 @@ namespace fInancialFinesseProject.Client.Services2
             }
         }
 
-        public async Task<ForumPost> GetForumPostbyUrl(string url)
+        public async Task<ForumPost> GetForumPostbyUrl(string url) //Fetches a forum post by its URL. If the post is found, it returns the post; otherwise, it logs an error message and returns a new ForumPost with the error message as the title.
         {
             //var post = await _http.GetFromJsonAsync<ForumPost>($"api/Forum/{url}");
             //return post;
@@ -44,27 +44,27 @@ namespace fInancialFinesseProject.Client.Services2
             }
         }
 
-        public async Task<List<ForumPost>> GetForumPosts()
+        public async Task<List<ForumPost>> GetForumPosts() //Retrieves all forum posts as a list asynchronously.
         {
             return await _http.GetFromJsonAsync<List<ForumPost>>("api/Forum");
         }
 
-        public async Task DeleteForumPost(int id)
+        public async Task DeleteForumPost(int id) //Sends a DELETE request to remove a forum post by its ID.
         {
             await _http.DeleteAsync($"api/Forum/{id}");
         }
-        public async Task<ForumPost> GetForumPostById(int id)
+        public async Task<ForumPost> GetForumPostById(int id) //Fetches a single blog post by its ID.
         {
             return await _http.GetFromJsonAsync<ForumPost>($"api/Forum/{id}");
         }
 
-        public async Task UpdateForumPost(ForumPost request)
+        public async Task UpdateForumPost(ForumPost request) //Sends a PUT request to update a blog post with new data.
         {
             Console.WriteLine($"Updating ForumPost with Category: {request.Category}");
             await _http.PutAsJsonAsync($"api/Forum/{request.Id}", request);
         }
 
-        public async Task<ForumComment> AddComment(ForumComment comment)
+        public async Task<ForumComment> AddComment(ForumComment comment) //Adds a new comment to a blog post. It sets the related blog post object to null (presumably to avoid circular references in JSON serialization) and sends a POST request.
         {
             comment.ForumPost = null;
             var response = await _http.PostAsJsonAsync("api/Forum/AddComment", comment);
@@ -78,7 +78,7 @@ namespace fInancialFinesseProject.Client.Services2
             return await response.Content.ReadFromJsonAsync<ForumComment>();
         }
 
-        public async Task<List<ForumComment>> GetCommentsByForumPostId(int forumPostId)
+        public async Task<List<ForumComment>> GetCommentsByForumPostId(int forumPostId) //Retrieves all comments for a specific blog post ID.
         {
             var response = await _http.GetAsync($"api/Forum/GetComments/{forumPostId}");
             if (!response.IsSuccessStatusCode)
@@ -91,7 +91,7 @@ namespace fInancialFinesseProject.Client.Services2
             return await response.Content.ReadFromJsonAsync<List<ForumComment>>();
         }
 
-        public async Task UpdateComment(ForumComment comment)
+        public async Task UpdateComment(ForumComment comment) //Sends a PUT request to update a specific comment.
         {
             var response = await _http.PutAsJsonAsync($"api/Forum/UpdateComment/{comment.Id}", comment);
 
@@ -103,39 +103,39 @@ namespace fInancialFinesseProject.Client.Services2
             }
         }
 
-        public async Task DeleteComment(int commentId)
+        public async Task DeleteComment(int commentId) //Sends a DELETE request to remove a specific comment.
         {
             var response = await _http.DeleteAsync($"api/Forum/DeleteComment/{commentId}");
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task<ForumComment> GetCommentById(int commentId)
+        public async Task<ForumComment> GetCommentById(int commentId) // Fetches a single comment by its ID.
         {
             return await _http.GetFromJsonAsync<ForumComment>($"api/Forum/GetCommentById/{commentId}");
         }
 
-        public async Task<List<ForumCategory>> GetCategories()
+        public async Task<List<ForumCategory>> GetCategories() //Retrieves all blog categories as a list.
         {
             return await _http.GetFromJsonAsync<List<ForumCategory>>("api/Forum/categories");
         }
 
-        public async Task<ForumCategory> CreateCategory(ForumCategory category)
+        public async Task<ForumCategory> CreateCategory(ForumCategory category) // Sends a POST request to create a new category.
         {
             var response = await _http.PostAsJsonAsync("api/Forum/categories", category);
             return await response.Content.ReadFromJsonAsync<ForumCategory>();
         }
 
-        public async Task UpdateCategory(ForumCategory category)
+        public async Task UpdateCategory(ForumCategory category) //Sends a PUT request to update a specific category.
         {
             await _http.PutAsJsonAsync($"api/Forum/categories/{category.Id}", category);
         }
 
-        public async Task DeleteCategory(int categoryId)
+        public async Task DeleteCategory(int categoryId) //Sends a DELETE request to remove a specific category.
         {
             await _http.DeleteAsync($"api/Forum/categories/{categoryId}");
         }
 
-        public async Task<ForumCategory> GetCategoryById(int categoryId)
+        public async Task<ForumCategory> GetCategoryById(int categoryId)  //Fetches a single category by its ID.
         {
             return await _http.GetFromJsonAsync<ForumCategory>($"api/Forum/categories/{categoryId}");
         }

@@ -13,6 +13,7 @@ namespace fInancialFinesseProject.Server.Controllers
     {
         private readonly DataContext _context;
         private readonly ILogger<BlogController> _logger;
+        //Initializes the controller with a database context and a logger.
 
         public BlogController(DataContext context, ILogger<BlogController> logger) 
         { 
@@ -21,13 +22,13 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<BlogPost>> GimmeAllTheBlogPosts()
+        public ActionResult<List<BlogPost>> GimmeAllTheBlogPosts() //Returns all blog posts ordered by their creation date.
         {
             return Ok(_context.BlogPosts.OrderByDescending(post => post.DateCreated));
         }
 
         [HttpGet("{url}")]
-        public ActionResult<BlogPost> GimmeThatSingleBlogPost(string url)
+        public ActionResult<BlogPost> GimmeThatSingleBlogPost(string url) //Fetches and returns a single blog post by its URL.
         {
             var post = _context.BlogPosts.FirstOrDefault(p => p.Url.ToLower().Equals(url.ToLower()));
 
@@ -40,7 +41,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
        
         [HttpPost]
-        public async Task<ActionResult<BlogPost>> CreateNewBlogPost(BlogPost request)
+        public async Task<ActionResult<BlogPost>> CreateNewBlogPost(BlogPost request) //Validates the request and creates a new blog post in the database.
         {
             if (!ModelState.IsValid)
             {
@@ -63,7 +64,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteBlogPost(int id)
+        public async Task<ActionResult> DeleteBlogPost(int id) //Deletes a specific blog post by ID.
         {
             var post = _context.BlogPosts.FirstOrDefault(p => p.Id == id);
             if (post == null)
@@ -78,7 +79,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<BlogPost> GetBlogPostById(int id)
+        public ActionResult<BlogPost> GetBlogPostById(int id) //Returns a single blog post by ID.
         {
             var blogPost = _context.BlogPosts.FirstOrDefault(p => p.Id == id);
             if (blogPost == null)
@@ -89,7 +90,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<BlogPost>> UpdateBlogPost(int id, BlogPost request)
+        public async Task<ActionResult<BlogPost>> UpdateBlogPost(int id, BlogPost request) //Updates a blog post with new data after validating the request.
         {
             Console.WriteLine($"Received Category to Update: {request.Category}");
             var post = _context.BlogPosts.FirstOrDefault(p => p.Id == id);
@@ -131,7 +132,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPost("AddComment")]
-        public async Task<ActionResult<BlogComment>> AddComment(BlogComment comment)
+        public async Task<ActionResult<BlogComment>> AddComment(BlogComment comment) // Adds a new comment to a blog post after validating the request.
         {
             if (!ModelState.IsValid)
             {
@@ -145,7 +146,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet("GetComments/{blogPostId}")]
-        public ActionResult<List<BlogComment>> GetCommentsByBlogPostId(int blogPostId)
+        public ActionResult<List<BlogComment>> GetCommentsByBlogPostId(int blogPostId) //Retrieves all comments for a specific blog post ID.
         {
             var comments = _context.Comments.Where(c => c.BlogPostId == blogPostId).OrderByDescending(c => c.DatePosted).ToList();
 
@@ -158,7 +159,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPut("UpdateComment/{id}")]
-        public async Task<IActionResult> UpdateComment(int id, [FromBody] BlogComment comment)
+        public async Task<IActionResult> UpdateComment(int id, [FromBody] BlogComment comment) //Updates an existing comment.
         {
             if (!ModelState.IsValid)
             {
@@ -181,7 +182,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpDelete("DeleteComment/{id}")]
-        public async Task<IActionResult> DeleteComment(int id)
+        public async Task<IActionResult> DeleteComment(int id) //Deletes a specific comment.
         {
             var comment = _context.Comments.Find(id);
             if (comment == null)
@@ -195,7 +196,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet("GetCommentById/{id}")]
-        public async Task<ActionResult<BlogComment>> GetCommentById(int id)
+        public async Task<ActionResult<BlogComment>> GetCommentById(int id) //Fetches a single comment by its ID.
         {
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)

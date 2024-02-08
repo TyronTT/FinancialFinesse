@@ -13,6 +13,7 @@ namespace fInancialFinesseProject.Server.Controllers
     {
         private readonly ForumDataContext _context;
         private readonly ILogger<ForumController> _logger;
+        //Initializes the controller with a database context and a logger.
 
         public ForumController(ForumDataContext context, ILogger<ForumController> logger) 
         {
@@ -21,13 +22,13 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<ForumPost>> GimmeAllTheForumPosts()
+        public ActionResult<List<ForumPost>> GimmeAllTheForumPosts() //Returns all blog posts ordered by their creation date.
         {
             return Ok(_context.ForumPosts.OrderByDescending(post => post.DateCreated));
         }
 
         [HttpGet("{url}")]
-        public ActionResult<ForumPost> GimmeThatSingleForumPost(string url)
+        public ActionResult<ForumPost> GimmeThatSingleForumPost(string url) //Fetches and returns a single blog post by its URL.
         {
             var post = _context.ForumPosts.FirstOrDefault(p => p.Url.ToLower().Equals(url.ToLower()));
             if(post == null)
@@ -39,7 +40,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ForumPost>> CreateNewForumPost(ForumPost request)
+        public async Task<ActionResult<ForumPost>> CreateNewForumPost(ForumPost request) //Validates the request and creates a new blog post in the database.
         {
             if (!ModelState.IsValid)
             {
@@ -62,7 +63,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteForumPost(int id)
+        public async Task<ActionResult> DeleteForumPost(int id) //Deletes a specific blog post by ID.
         {
             var post = _context.ForumPosts.FirstOrDefault(p => p.Id == id);
             if (post == null)
@@ -77,7 +78,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<ForumPost> GetForumPostById(int id)
+        public ActionResult<ForumPost> GetForumPostById(int id) //Returns a single blog post by ID.
         {
             var forumPost = _context.ForumPosts.FirstOrDefault(p => p.Id == id);
             if (forumPost == null)
@@ -88,7 +89,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ForumPost>> UpdateForumPost(int id, ForumPost request)
+        public async Task<ActionResult<ForumPost>> UpdateForumPost(int id, ForumPost request) //Updates a blog post with new data after validating the request.
         {
             Console.WriteLine($"Received Category to Update: {request.Category}");
             var post = _context.ForumPosts.FirstOrDefault(p => p.Id == id);
@@ -130,7 +131,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPost("AddComment")]
-        public async Task<ActionResult<ForumComment>> AddComment(ForumComment comment)
+        public async Task<ActionResult<ForumComment>> AddComment(ForumComment comment) // Adds a new comment to a blog post after validating the request.
         {
             if (!ModelState.IsValid)
             {
@@ -144,7 +145,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet("GetComments/{forumPostId}")]
-        public ActionResult<List<ForumComment>> GetCommentsByForumPostId(int forumPostId)
+        public ActionResult<List<ForumComment>> GetCommentsByForumPostId(int forumPostId) //Retrieves all comments for a specific blog post ID.
         {
             var comments = _context.forumComments.Where(c => c.ForumPostId == forumPostId).OrderByDescending(c => c.DatePosted).ToList();
 
@@ -157,7 +158,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpPut("UpdateComment/{id}")]
-        public async Task<IActionResult> UpdateComment(int id, [FromBody] ForumComment comment)
+        public async Task<IActionResult> UpdateComment(int id, [FromBody] ForumComment comment) //Updates an existing comment.
         {
             if (!ModelState.IsValid)
             {
@@ -180,7 +181,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpDelete("DeleteComment/{id}")]
-        public async Task<IActionResult> DeleteComment(int id)
+        public async Task<IActionResult> DeleteComment(int id) //Deletes a specific comment.
         {
             var comment = _context.forumComments.Find(id);
             if (comment == null)
@@ -194,7 +195,7 @@ namespace fInancialFinesseProject.Server.Controllers
         }
 
         [HttpGet("GetCommentById/{id}")]
-        public async Task<ActionResult<ForumComment>> GetCommentById(int id)
+        public async Task<ActionResult<ForumComment>> GetCommentById(int id) //Fetches a single comment by its ID.
         {
             var comment = await _context.forumComments.FindAsync(id);
             if (comment == null)

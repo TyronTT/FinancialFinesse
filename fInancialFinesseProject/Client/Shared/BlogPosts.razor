@@ -3,6 +3,7 @@
 
 <input type="text" @bind="searchTerm" placeholder="Search by category..." class="form-control mb-3" />
 
+
 @foreach (var post in FilteredPosts)
 {
     <div class="card my-4">
@@ -20,12 +21,12 @@
 }
 
 @code {
-    private List<BlogPost> Posts = new List<BlogPost>();
-    private string searchTerm = string.Empty;
+    private List<BlogPost> Posts = new List<BlogPost>(); //This field holds the collection of blog posts fetched from the server.Initialized as an empty list
+    private string searchTerm = string.Empty; //This field holds the collection of blog posts fetched from the server
 
     string placeholderImage = "https://loremflickr.com/1060/180";
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() //fetch GetBlogPosts data
     {
         Posts = await BlogService.GetBlogPosts();
     }
@@ -34,4 +35,5 @@
         string.IsNullOrWhiteSpace(searchTerm) ?
         Posts :
         Posts.Where(post => post.Category?.ToLower().Contains(searchTerm.ToLower()) ?? false);
+    //If searchTerm is empty or consists only of whitespace, FilteredPosts simply returns all posts. If searchTerm has a value, it filters the list to include only those posts whose Category contains the search term, ignoring case
 }

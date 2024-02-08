@@ -66,38 +66,38 @@ else
 }
 
 @code {
-    private fInancialFinesseProject.Shared.Domain.BlogPost CurrentPost;
-    private List<BlogComment> comments = new List<BlogComment>();
-    private BlogComment newComment = new BlogComment();
-    private BlogCategory specificCategory;
+    private fInancialFinesseProject.Shared.Domain.BlogPost CurrentPost; //CurrentPost: Holds the data for the currently viewed post.
+    private List<BlogComment> comments = new List<BlogComment>(); //comments: A list of comments for the current post.
+    private BlogComment newComment = new BlogComment(); //newComment: A model for adding a new comment to the post.
+    private BlogCategory specificCategory; //specificCategory: Optionally, shows a specific category related to the post.
 
     [Parameter]
     public string Url { get; set; }
 
-    string placeholderImage = "https://loremflickr.com/1060/300";
+    string placeholderImage = "https://loremflickr.com/1060/300"; //placeholderImage: A default image URL to use if the post does not have an image.
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() //OnInitializedAsync: Loads the blog post and its comments when the component initializes.
     {
         await LoadBlogPost();
         await LoadComments();
         //await LoadSpecificCategory();
     }
 
-    private async Task LoadBlogPost()
+    private async Task LoadBlogPost() //LoadBlogPost: Fetches the blog post data.
     {
         // Logic to load the blog post
         CurrentPost = await BlogService.GetBlogPostByUrl(Url);
     }
 
-    private void NavigateToEdit()
+    private void NavigateToEdit() //Navigates to EditPost.razor page
     {
         NavigationManager.NavigateTo($"/edit/{CurrentPost.Id}");
     }
 
-    private async Task ConfirmDelete()
+    private async Task ConfirmDelete() //Double check with user before deleting post
     {
         var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Are you sure you want to delete this Blog?" });
         if (confirmed)
@@ -106,27 +106,27 @@ else
         }
     }
 
-    private async Task DeletePost()
+    private async Task DeletePost() // Functionality to delete post
     {
         await BlogService.DeleteBlogPost(CurrentPost.Id);
         NavigationManager.NavigateTo("/");
     }
 
-    private async Task LoadComments()
+    private async Task LoadComments() //calls GetCommentsByBlogPostId on the BlogService, providing the Id to the post
     {
         comments = await BlogService.GetCommentsByBlogPostId(CurrentPost.Id);
     }
 
-    private async Task AddComment()
+    private async Task AddComment() //This method is triggered when a user submits a new comment. It prepares the newComment object by setting its BlogPost or BlogPostId property to associate the comment with the current blog post
     {
         @*newComment.BlogPostId = CurrentPost.Id; // Ensure the comment is associated with the current post
         await BlogService.AddComment(newComment);
         newComment = new BlogComment(); // Reset the comment
         await LoadComments(); // Reload comments*@
 
-        newComment.BlogPost = CurrentPost; // Make sure CurrentPost is the correct BlogPost object
-                                           // Or set only the required fields
-        newComment.BlogPostId = CurrentPost.Id; // If only the ID is sufficient
+        newComment.BlogPost = CurrentPost; 
+                                          
+        newComment.BlogPostId = CurrentPost.Id; 
 
         await BlogService.AddComment(newComment);
         newComment = new BlogComment(); // Reset the comment
@@ -134,7 +134,7 @@ else
     }
 
 
-    private async Task DeleteComment(int commentId)
+    private async Task DeleteComment(int commentId) //functionality to delete comment
     {
         var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this comment?");
         if (confirmed)
@@ -145,15 +145,15 @@ else
         }
     }
 
-    private void EditComment(BlogComment comment)
+    private void EditComment(BlogComment comment) //navigate to EditComment page
     {
         NavigationManager.NavigateTo($"/edit-comment/{comment.Id}");
     }
 
-    private async Task LoadSpecificCategory()
+    private async Task LoadSpecificCategory() //It uses a hardcoded Id (test = 1) to fetch a category by its ID using BlogService.GetCategoryById(test). The fetched category is then stored in specificCategory
     {
-        int test = 1; // Assuming you have the ID you want to search for
-                      // You need a method in your BlogService to fetch a category by ID
+        int test = 1; 
+                      
         specificCategory = await BlogService.GetCategoryById(test);
     }
 }

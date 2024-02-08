@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Xml.Linq;
 
+//Defines the contract for the blog service, specifying the operations that must be implemented, including CRUD operations for blog posts, comments, and categories.
 namespace fInancialFinesseProject.Client.Services
 {
     interface IBlogService

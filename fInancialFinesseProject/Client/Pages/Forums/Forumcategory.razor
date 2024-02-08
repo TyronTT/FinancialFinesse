@@ -49,14 +49,14 @@ else
 }
 
 @code {
-    private List<ForumCategory>? Categories;
+    private List<ForumCategory>? Categories; //Categories: Holds a list of all categories fetched from the backend.
 
-    protected async override Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync() //OnInitializedAsync: Loads all categories when the component initializes.
     {
         Categories = await ForumService.GetCategories();
     }
 
-    async Task Delete(int categoryId)
+    async Task Delete(int categoryId) //Delete: Handles the deletion of a category after confirmation from the user. It removes the category from the backend and updates the local list.
     {
         if (Categories != null)
         {

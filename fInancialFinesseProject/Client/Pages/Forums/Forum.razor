@@ -65,10 +65,10 @@ else
 }
 
 @code {
-    private fInancialFinesseProject.Shared.ForumPost CurrentPost;
-    private List<ForumComment> comments = new List<ForumComment>();
-    private ForumComment newComment = new ForumComment();
-    private ForumCategory specificCategory;
+    private fInancialFinesseProject.Shared.ForumPost CurrentPost; //CurrentPost: Holds the data for the currently viewed post.
+    private List<ForumComment> comments = new List<ForumComment>(); //comments: A list of comments for the current post.
+    private ForumComment newComment = new ForumComment(); //newComment: A model for adding a new comment to the post
+    private ForumCategory specificCategory; //specificCategory: Optionally, shows a specific category related to the post.
 
     [Parameter]
     public string Url { get; set; }
@@ -76,24 +76,24 @@ else
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() //OnInitializedAsync: Loads the forum post and its comments when the component initializes.
     {
         await LoadForumPost();
         await LoadComments();
     }
 
-    private async Task LoadForumPost()
+    private async Task LoadForumPost() //LoadBlogPost: Fetches the blog post data.
     {
         // Logic to load the blog post
         CurrentPost = await ForumService.GetForumPostbyUrl(Url);
     }
 
-    private void NavigateToEdit()
+    private void NavigateToEdit() //Navigates to EditForum.razor page
     {
         NavigationManager.NavigateTo($"/editforum/{CurrentPost.Id}");
     }
 
-    private async Task ConfirmDelete()
+    private async Task ConfirmDelete() //Double check with user before deleting post
     {
         var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Are you sure you want to delete this Forum?" });
         if (confirmed)
@@ -102,34 +102,34 @@ else
         }
     }
 
-    private async Task DeleteForum()
+    private async Task DeleteForum() // Functionality to delete post
     {
         await ForumService.DeleteForumPost(CurrentPost.Id);
         NavigationManager.NavigateTo("/forums");
     }
 
-    private async Task LoadComments()
+    private async Task LoadComments() //calls GetCommentsByForumPostId on the BlogService, providing the Id to the post
     {
         comments = await ForumService.GetCommentsByForumPostId(CurrentPost.Id);
     }
 
-    private async Task AddComment()
+    private async Task AddComment() //This method is triggered when a user submits a new comment. It prepares the newComment object by setting its BlogPost or BlogPostId property to associate the comment with the current blog post
     {
         @*newComment.BlogPostId = CurrentPost.Id; // Ensure the comment is associated with the current post
         await BlogService.AddComment(newComment);
         newComment = new BlogComment(); // Reset the comment
         await LoadComments(); // Reload comments*@
 
-        newComment.ForumPost = CurrentPost; // Make sure CurrentPost is the correct BlogPost object
-                                           // Or set only the required fields
-        newComment.ForumPostId = CurrentPost.Id; // If only the ID is sufficient
+        newComment.ForumPost = CurrentPost; 
+                                           
+        newComment.ForumPostId = CurrentPost.Id; 
 
         await ForumService.AddComment(newComment);
         newComment = new ForumComment(); // Reset the comment
         await LoadComments(); // Reload comments
     }
 
-    private async Task DeleteComment(int commentId)
+    private async Task DeleteComment(int commentId) //functionality to delete comment
     {
         var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this comment?");
         if (confirmed)
@@ -139,15 +139,15 @@ else
         }
     }
 
-    private void EditComment(ForumComment comment)
+    private void EditComment(ForumComment comment) //navigate to EditComment page
     {
         NavigationManager.NavigateTo($"/edit-fcomment/{comment.Id}");
     }
 
-    private async Task LoadSpecificCategory()
+    private async Task LoadSpecificCategory() //It uses a hardcoded Id (test = 1) to fetch a category by its ID using BlogService.GetCategoryById(test). The fetched category is then stored in specificCategory
     {
-        int test = 1; // Assuming you have the ID you want to search for
-                      // You need a method in your BlogService to fetch a category by ID
+        int test = 1; 
+                      
         specificCategory = await ForumService.GetCategoryById(test);
     }
 }

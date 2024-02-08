@@ -80,26 +80,26 @@
 </EditForm>
 
 @code {
-    fInancialFinesseProject.Shared.Domain.BlogPost newBlogPost = new fInancialFinesseProject.Shared.Domain.BlogPost
+    fInancialFinesseProject.Shared.Domain.BlogPost newBlogPost = new fInancialFinesseProject.Shared.Domain.BlogPost //newBlogPost: Holds the data for the new blog post being created.
         {
             Image = ""
         };
 
-    private List<BlogCategory> categories; // Assuming Category is your model for categories
+    private List<BlogCategory> categories; //categories: A list of available categories to assign to the blog post.
     //private IList<BlogCategory>? categories;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() //OnInitializedAsync: Loads the categories from the backend when the component initializes.
     {
         categories = await BlogService.GetCategories();
     }
 
-    async Task CreateNewBlogPost()
+    async Task CreateNewBlogPost() //CreateNewBlogPost: Called when the form is submitted. It creates the new blog post through BlogService and redirects to the newly created post's page.
     {
         var result = await BlogService.CreateNewBlogPost(newBlogPost);
         NavigationManager.NavigateTo($"posts/{result.Url}");
     }
 
-    async Task OnFileChange(InputFileChangeEventArgs e)
+    async Task OnFileChange(InputFileChangeEventArgs e) //OnFileChange: Handles image file uploads, resizing the image and converting it to a base64 string to be stored in newBlogPost.Image.
     {
         var format = "image/png";
         var resizedImage = await e.File.RequestImageFileAsync(format, 1060, 1060);
